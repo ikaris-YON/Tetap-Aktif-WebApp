@@ -3,10 +3,9 @@ FROM node:18-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-COPY package.json ./
-# Hapus package-lock.json dari COPY agar npm membuat ulang dependency murni khusus Linux Alpine
-# Kita pakai --omit=dev jika memungkinkan, tapi untuk build NextJS kita butuh devDependencies juga.
-RUN npm install --platform=linux --arch=x64
+COPY package.json package-lock.json* ./
+# Kita kembalikan ke npm ci standar, tapi tambahkan env bypass di bawah
+RUN npm ci
 
 # Tahap 2: Build aplikasi
 FROM node:18-alpine AS builder
@@ -14,6 +13,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# --- ENV SAKTI UNTUK BYPASS ERROR BINDING TAIWIND V4 ---
+ENV TAILWIND_DISABLE_OXIDE=1
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build
