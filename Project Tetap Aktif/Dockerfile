@@ -4,7 +4,6 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-# Kita kembalikan ke npm ci standar, tapi tambahkan env bypass di bawah
 RUN npm ci
 
 # Tahap 2: Build aplikasi
@@ -13,8 +12,6 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# --- ENV SAKTI UNTUK BYPASS ERROR BINDING TAIWIND V4 ---
-ENV TAILWIND_DISABLE_OXIDE=1
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build
