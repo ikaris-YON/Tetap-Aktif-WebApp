@@ -4,7 +4,8 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-RUN npm ci
+# Menggunakan npm ci dan memaksa install ulang arsitektur biner yang sesuai di Linux
+RUN npm ci && npm rebuild
 
 # Tahap 2: Build aplikasi
 FROM node:18-alpine AS builder
