@@ -1,13 +1,11 @@
-# Tahap 1: Install dependencies
-FROM node:18-alpine AS deps
-RUN apk add --no-cache libc6-compat
+# Tahap 1: Install dependencies menggunakan OS Debian Slim
+FROM node:18-slim AS deps
 WORKDIR /app
-
 COPY package.json package-lock.json* ./
 RUN npm ci
 
 # Tahap 2: Build aplikasi
-FROM node:18-alpine AS builder
+FROM node:18-slim AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -17,7 +15,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # Tahap 3: Runner (Kontainer Akhir)
-FROM node:18-alpine AS runner
+FROM node:18-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
